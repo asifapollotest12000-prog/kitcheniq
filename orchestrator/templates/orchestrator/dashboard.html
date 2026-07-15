@@ -1,0 +1,654 @@
+{% extends 'orchestrator/base.html' %}
+{% load static %}
+
+{% block title %}Dashboard | KitchenIQ Orchestrator{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'orchestrator/css/dashboard.css?v=3' %}">
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    
+    <!-- LEFT SIDEBAR -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="brand">
+                <svg class="logo" width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="12" cy="12" r="10" fill="#00828a"/>
+                    <path d="M12 7V17M7 12H17" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                <div class="brand-names">
+                    <span class="brand-main">Kitchen<span class="highlight">IQ</span> <span style="font-size: 10px; font-weight: 700; color: #ffffff; background: #00828a; padding: 1px 4px; border-radius: 3px; vertical-align: middle; margin-left: 4px; letter-spacing: 0.5px; text-transform: uppercase;">Beta</span></span>
+                    <span class="brand-sub">Orchestrator</span>
+                </div>
+            </div>
+            <button class="hamburger-btn">
+                <i data-lucide="menu"></i>
+            </button>
+        </div>
+        
+        <nav class="sidebar-menu">
+            <ul>
+                <li class="active">
+                    <a href="{% url 'dashboard' %}">
+                        <i data-lucide="layout-dashboard"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <i data-lucide="check-square"></i>
+                        <span>Daily Actions</span>
+                        <span class="badge badge-gray">8</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <i data-lucide="bell"></i>
+                        <span>Alerts</span>
+                        <span class="badge badge-brand">12</span>
+                    </a>
+                </li>
+                <li class="has-submenu">
+                    <a href="#" class="submenu-toggle">
+                        <i data-lucide="trending-up"></i>
+                        <span>Sales & Orders</span>
+                        <i data-lucide="chevron-right" class="arrow" style="transition: transform 0.2s;"></i>
+                    </a>
+                    <ul class="submenu-list" style="display: none; list-style: none; padding-left: 24px; margin-top: 4px; flex-direction: column; gap: 4px;">
+                        <li>
+                            <a href="{% url 'commission_invoice' %}" style="padding: 6px 12px; font-size: 12px;">
+                                <i data-lucide="scan" style="width: 14px; height: 14px; vertical-align: middle; margin-right: 6px;"></i>
+                                <span>Scan Commission Invoice</span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="has-submenu">
+                    <a href="#">
+                        <i data-lucide="activity"></i>
+                        <span>Performance</span>
+                        <i data-lucide="chevron-right" class="arrow"></i>
+                    </a>
+                </li>
+                <li class="has-submenu">
+                    <a href="{% url 'recipes' %}">
+                        <i data-lucide="book-open"></i>
+                        <span>Menu &amp; Recipes</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <i data-lucide="dollar-sign"></i>
+                        <span>Profitability</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <i data-lucide="trash-2"></i>
+                        <span>Waste Management</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <i data-lucide="clipboard-list"></i>
+                        <span>Production & Prep</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'inventory' %}">
+                        <i data-lucide="package"></i>
+                        <span>Inventory</span>
+                    </a>
+                </li>
+                <li class="has-submenu">
+                    <a href="#">
+                        <i data-lucide="chef-hat"></i>
+                        <span>Kitchen Operations</span>
+                        <i data-lucide="chevron-down" class="arrow"></i>
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <i data-lucide="users"></i>
+                        <span>Staff & Labour</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <i data-lucide="megaphone"></i>
+                        <span>Marketing & Campaigns</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <i data-lucide="file-text"></i>
+                        <span>Reports & Exports</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <i data-lucide="bar-chart-2"></i>
+                        <span>Benchmarking</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'settings' %}">
+                        <i data-lucide="settings"></i>
+                        <span>Settings</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+        
+        <div class="sidebar-footer">
+            <div class="active-site-box">
+                <span class="label">Active Site</span>
+                <div class="site-selector-trigger">
+                    <span class="site-name">Hessa Street</span>
+                    <a href="#" class="change-link">Change</a>
+                </div>
+            </div>
+            
+            <a href="#" class="support-link">
+                <i data-lucide="help-circle"></i>
+                <span>Support</span>
+            </a>
+        </div>
+    </aside>
+    
+    <!-- MAIN CONTENT PANEL -->
+    <main class="main-content">
+        <!-- HEADER -->
+        <header class="content-header">
+            <div class="header-left">
+                <h1 id="welcome-greeting">Good morning, {{ request.user.first_name|default:request.user.username }} 👋</h1>
+                <p class="subtitle">Here's what's happening across your kitchens today.</p>
+            </div>
+            
+            <div class="header-right">
+                <!-- Date Selector -->
+                <div class="filter-control date-picker">
+                    <i data-lucide="calendar"></i>
+                    <span>Thu, 22 May 2025</span>
+                    <i data-lucide="chevron-down" class="chevron"></i>
+                </div>
+                
+                <!-- Brand Filter Dropdown -->
+                <div class="filter-control dropdown-wrapper">
+                    <select id="brandFilter" onchange="filterData()">
+                        {% for brand in brands %}
+                        <option value="{{ brand.id }}" {% if selected_brand == brand.id %}selected{% endif %}>{{ brand.name }}</option>
+                        {% endfor %}
+                    </select>
+                    <i data-lucide="chevron-down" class="select-chevron"></i>
+                </div>
+                
+                <!-- Site Filter Dropdown -->
+                <div class="filter-control dropdown-wrapper">
+                    <select id="siteFilter" onchange="filterData()">
+                        {% for site in sites %}
+                        <option value="{{ site.id }}" {% if selected_site == site.id %}selected{% endif %}>{{ site.name }}</option>
+                        {% endfor %}
+                    </select>
+                    <i data-lucide="chevron-down" class="select-chevron"></i>
+                </div>
+                
+                <!-- User Profile & Notification -->
+                <div class="user-profile-widget">
+                    <div class="notification-bell">
+                        <i data-lucide="bell"></i>
+                        <span class="notif-badge">12</span>
+                    </div>
+                    <div class="profile-info" onclick="toggleProfileDropdown()">
+                        <img src="{{ request.user.profile.profile_pic_url|default:'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=80&fit=crop&q=80' }}" alt="Avatar" class="avatar">
+                        <div class="profile-details">
+                            <span class="user-name">
+                                {{ request.user.first_name|default:request.user.username }}
+                                <i data-lucide="chevron-down" class="chevron"></i>
+                            </span>
+                            <span class="user-role">{{ request.user.profile.designation|default:'Operations Manager' }}</span>
+                        </div>
+                        
+                        <!-- Dropdown Menu -->
+                        <div class="profile-menu" id="profileDropdown">
+                            <a href="{% url 'settings' %}"><i data-lucide="settings"></i> Account Settings</a>
+                            <hr>
+                            <a href="{% url 'logout' %}" class="logout-link"><i data-lucide="log-out"></i> Log Out</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+        
+        <!-- KPI CARDS GRID -->
+        <section class="kpi-grid">
+            <!-- Card 1: Sales -->
+            <div class="kpi-card green-accent">
+                <div class="kpi-header">
+                    <div class="icon-circle">
+                        <i data-lucide="shopping-bag"></i>
+                    </div>
+                    <span class="kpi-title">Sales (Today)</span>
+                </div>
+                <div class="kpi-body">
+                    <span class="kpi-value">{{ data.sales_today }}</span>
+                    <span class="kpi-trend trend-up">
+                        <i data-lucide="arrow-up-right"></i> {{ data.sales_trend }}
+                    </span>
+                </div>
+            </div>
+            
+            <!-- Card 2: Orders -->
+            <div class="kpi-card blue-accent">
+                <div class="kpi-header">
+                    <div class="icon-circle">
+                        <i data-lucide="file-spreadsheet"></i>
+                    </div>
+                    <span class="kpi-title">Orders (Today)</span>
+                </div>
+                <div class="kpi-body">
+                    <span class="kpi-value">{{ data.orders_today }}</span>
+                    <span class="kpi-trend trend-up">
+                        <i data-lucide="arrow-up-right"></i> {{ data.orders_trend }}
+                    </span>
+                </div>
+            </div>
+            
+            <!-- Card 3: Contribution Margin -->
+            <div class="kpi-card purple-accent">
+                <div class="kpi-header">
+                    <div class="icon-circle">
+                        <i data-lucide="pie-chart"></i>
+                    </div>
+                    <span class="kpi-title">Contribution Margin</span>
+                </div>
+                <div class="kpi-body">
+                    <span class="kpi-value">{{ data.margin_today }}</span>
+                    <div class="kpi-subtext">
+                        <span class="label-badge">{{ data.margin_pct }} margin</span>
+                        <span class="kpi-trend trend-up">
+                            <i data-lucide="arrow-up-right"></i> {{ data.margin_trend }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Card 4: Waste -->
+            <div class="kpi-card orange-accent">
+                <div class="kpi-header">
+                    <div class="icon-circle">
+                        <i data-lucide="trash-2"></i>
+                    </div>
+                    <span class="kpi-title">Waste (Today)</span>
+                </div>
+                <div class="kpi-body">
+                    <span class="kpi-value">{{ data.waste_today }}</span>
+                    <div class="kpi-subtext">
+                        <span class="label-badge">{{ data.waste_pct }} of sales</span>
+                        <span class="kpi-trend trend-down">
+                            <i data-lucide="arrow-down-right"></i> {{ data.waste_trend }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Card 5: Kitchen Load -->
+            <div class="kpi-card red-accent">
+                <div class="kpi-header">
+                    <div class="icon-circle">
+                        <i data-lucide="flame"></i>
+                    </div>
+                    <span class="kpi-title">Kitchen Load (Now)</span>
+                </div>
+                <div class="kpi-body">
+                    <div class="kpi-value-row">
+                        <span class="kpi-value">{{ data.kitchen_load }}</span>
+                        <span class="status-badge status-danger">{{ data.kitchen_load_status }}</span>
+                    </div>
+                    <span class="kpi-trend trend-up">
+                        <i data-lucide="arrow-up-right"></i> {{ data.kitchen_load_trend }}
+                    </span>
+                </div>
+            </div>
+            
+            <!-- Card 6: Alerts -->
+            <div class="kpi-card alarm-accent">
+                <div class="kpi-header">
+                    <div class="icon-circle">
+                        <i data-lucide="alert-triangle"></i>
+                    </div>
+                    <span class="kpi-title">Alerts (Active)</span>
+                </div>
+                <div class="kpi-body">
+                    <div class="kpi-value-row">
+                        <span class="kpi-value">{{ data.alerts_active }}</span>
+                        <span class="status-text">{{ data.alerts_status }}</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- CHARTS & TABLES SECTION -->
+        <section class="dashboard-row row-charts">
+            <!-- Box 1: Sales & Margin Trend -->
+            <div class="dashboard-box col-6">
+                <div class="box-header">
+                    <h2>Sales & Contribution Margin Trend</h2>
+                    <div class="box-actions">
+                        <div class="filter-control dropdown-wrapper sm">
+                            <select>
+                                <option>7 Days</option>
+                                <option>30 Days</option>
+                            </select>
+                            <i data-lucide="chevron-down" class="select-chevron"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="box-body">
+                    <div id="salesMarginChart" class="chart-container"></div>
+                </div>
+            </div>
+            
+            <!-- Box 2: Margin by Brand -->
+            <div class="dashboard-box col-3">
+                <div class="box-header">
+                    <h2>Contribution Margin by Brand</h2>
+                </div>
+                <div class="box-body flex-column-center">
+                    <div id="marginBrandChart" class="chart-container"></div>
+                </div>
+            </div>
+            
+            <!-- Box 3: Top/Bottom Items -->
+            <div class="dashboard-box col-3">
+                <div class="box-header">
+                    <h2>Top / Bottom Items by Margin</h2>
+                </div>
+                <div class="box-body">
+                    <div class="table-tabs">
+                        <button class="tab-btn active" onclick="switchItemTab('top')">Top Items</button>
+                        <button class="tab-btn" onclick="switchItemTab('bottom')">Bottom Items</button>
+                    </div>
+                    
+                    <div class="table-wrapper">
+                        <!-- Top Items Table -->
+                        <table id="topItemsTable" class="items-table">
+                            <thead>
+                                <tr>
+                                    <th>Item</th>
+                                    <th class="text-right">Sales</th>
+                                    <th class="text-right">Margin</th>
+                                    <th class="text-right">Margin %</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in data.top_items %}
+                                <tr>
+                                    <td class="font-semibold">{{ item.name }}</td>
+                                    <td class="text-right">{{ item.sales }}</td>
+                                    <td class="text-right font-semibold">{{ item.margin }}</td>
+                                    <td class="text-right green-text font-semibold">{{ item.margin_pct }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        
+                        <!-- Bottom Items Table -->
+                        <table id="bottomItemsTable" class="items-table hidden">
+                            <thead>
+                                <tr>
+                                    <th>Item</th>
+                                    <th class="text-right">Sales</th>
+                                    <th class="text-right">Margin</th>
+                                    <th class="text-right">Margin %</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in data.bottom_items %}
+                                <tr>
+                                    <td class="font-semibold">{{ item.name }}</td>
+                                    <td class="text-right">{{ item.sales }}</td>
+                                    <td class="text-right font-semibold">{{ item.margin }}</td>
+                                    <td class="text-right red-text font-semibold">{{ item.margin_pct }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <a href="#" class="view-all-link">View all items <i data-lucide="arrow-right"></i></a>
+                </div>
+            </div>
+        </section>
+        
+        <!-- WIDGETS ROW 2 -->
+        <section class="dashboard-row row-widgets-4">
+            <!-- Kitchen Load by Station -->
+            <div class="dashboard-box col-3">
+                <div class="box-header">
+                    <h2>Kitchen Load by Station (Live)</h2>
+                </div>
+                <div class="box-body">
+                    <div class="stations-list">
+                        {% for station in data.station_loads %}
+                        <div class="station-row">
+                            <div class="station-meta">
+                                <span class="station-name">{{ station.name }}</span>
+                                <span class="station-pct">{{ station.pct }}%</span>
+                            </div>
+                            <div class="progress-bar-bg">
+                                <div class="progress-bar-fill" style="width: {{ station.pct }}%; background-color: {{ station.color }}"></div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <a href="#" class="view-all-link">View kitchen operations <i data-lucide="arrow-right"></i></a>
+                </div>
+            </div>
+            
+            <!-- Waste Risk Overview -->
+            <div class="dashboard-box col-3">
+                <div class="box-header">
+                    <h2>Waste Risk Overview</h2>
+                </div>
+                <div class="box-body flex-column-center">
+                    <div id="wasteRiskChart" class="chart-container"></div>
+                </div>
+                <div class="box-footer">
+                    <a href="#" class="view-all-link">View waste dashboard <i data-lucide="arrow-right"></i></a>
+                </div>
+            </div>
+            
+            <!-- Daily Action Recommendations -->
+            <div class="dashboard-box col-3">
+                <div class="box-header">
+                    <h2>Daily Action Recommendations</h2>
+                </div>
+                <div class="box-body">
+                    <ul class="recommendation-list">
+                        {% for rec in data.recommendations %}
+                        <li class="recommendation-item">
+                            <span class="number-circle">{{ forloop.counter }}</span>
+                            <div class="rec-details">
+                                <span class="rec-text">{{ rec.text }}</span>
+                                <span class="rec-sub">{{ rec.sub }}</span>
+                            </div>
+                            <span class="level-badge badge-{{ rec.level|lower }}">{{ rec.level }}</span>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    <a href="#" class="view-all-link">View all actions <i data-lucide="arrow-right"></i></a>
+                </div>
+            </div>
+            
+            <!-- Alerts -->
+            <div class="dashboard-box col-3">
+                <div class="box-header">
+                    <h2>Alerts</h2>
+                    <a href="#" class="view-all-link sm">View all</a>
+                </div>
+                <div class="box-body">
+                    <ul class="alerts-timeline">
+                        {% for alert in data.alerts_list %}
+                        <li class="alert-timeline-item">
+                            <span class="timeline-dot dot-{{ alert.type }}"></span>
+                            <div class="alert-info-box">
+                                <span class="alert-text">{{ alert.text }}</span>
+                                <span class="alert-time">{{ alert.time }}</span>
+                            </div>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </section>
+        
+        <!-- WIDGETS ROW 3 (BOTTOM WIDGETS) -->
+        <section class="dashboard-row row-widgets-4">
+            <!-- Prep vs Forecast -->
+            <div class="dashboard-box col-3">
+                <div class="box-header">
+                    <h2>Prep vs Forecast</h2>
+                    <div class="box-actions">
+                        <div class="filter-control dropdown-wrapper sm">
+                            <select><option>Today</option></select>
+                            <i data-lucide="chevron-down" class="select-chevron"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="box-body grid-3-cols">
+                    <div class="stat-cell">
+                        <span class="stat-label">Prepared</span>
+                        <span class="stat-value font-medium">{{ data.prep_vs_forecast.prepared }}</span>
+                    </div>
+                    <div class="stat-cell">
+                        <span class="stat-label">Forecast</span>
+                        <span class="stat-value font-medium">{{ data.prep_vs_forecast.forecast }}</span>
+                    </div>
+                    <div class="stat-cell">
+                        <span class="stat-label">Variance</span>
+                        <span class="stat-value text-red font-bold">
+                            {{ data.prep_vs_forecast.variance }}
+                            <span class="stat-subtext">{{ data.prep_vs_forecast.variance_pct }}</span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Inventory Health -->
+            <div class="dashboard-box col-3">
+                <div class="box-header">
+                    <h2>Inventory Health</h2>
+                </div>
+                <div class="box-body grid-3-cols">
+                    <div class="stat-cell">
+                        <span class="stat-label">Value</span>
+                        <span class="stat-value font-medium">{{ data.inventory_health.value }}</span>
+                    </div>
+                    <div class="stat-cell">
+                        <span class="stat-label">At Risk</span>
+                        <span class="stat-value font-medium">{{ data.inventory_health.at_risk }}</span>
+                    </div>
+                    <div class="stat-cell">
+                        <span class="stat-label">At Risk %</span>
+                        <span class="stat-value text-red font-bold">{{ data.inventory_health.at_risk_pct }}</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Promotion Performance -->
+            <div class="dashboard-box col-3">
+                <div class="box-header">
+                    <h2>Promotion Performance</h2>
+                </div>
+                <div class="box-body grid-3-cols">
+                    <div class="stat-cell">
+                        <span class="stat-label">Active Campaigns</span>
+                        <span class="stat-value font-medium">{{ data.promotion_performance.active }}</span>
+                    </div>
+                    <div class="stat-cell">
+                        <span class="stat-label">Incremental Sales</span>
+                        <span class="stat-value text-green font-bold">{{ data.promotion_performance.incremental_sales }}</span>
+                    </div>
+                    <div class="stat-cell">
+                        <span class="stat-label">Incremental Margin</span>
+                        <span class="stat-value text-green font-bold">{{ data.promotion_performance.incremental_margin }}</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Virtual Brand Opportunities -->
+            <div class="dashboard-box col-3">
+                <div class="box-header">
+                    <h2>Virtual Brand Opportunities</h2>
+                </div>
+                <div class="box-body grid-3-cols">
+                    <div class="stat-cell">
+                        <span class="stat-label">High Potential</span>
+                        <span class="stat-value font-medium">{{ data.brand_opps.high }}</span>
+                    </div>
+                    <div class="stat-cell">
+                        <span class="stat-label">Test In Progress</span>
+                        <span class="stat-value font-medium">{{ data.brand_opps.in_progress }}</span>
+                    </div>
+                    <div class="stat-cell">
+                        <span class="stat-label">Needs Review</span>
+                        <span class="stat-value font-medium">{{ data.brand_opps.needs_review }}</span>
+                    </div>
+                </div>
+                <div class="box-footer" style="padding-top: 10px;">
+                    <a href="#" class="view-all-link">View opportunities <i data-lucide="arrow-right"></i></a>
+                </div>
+            </div>
+        </section>
+    </main>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Pass Django template data to JavaScript variables safely -->
+<script>
+    const currencySymbol = '{{ currency_symbol|escapejs }}';
+    const chartSalesData = JSON.parse('{{ chart_sales_json|escapejs }}');
+    const chartMarginData = JSON.parse('{{ chart_margin_json|escapejs }}');
+    const chartDates = JSON.parse('{{ chart_dates_json|escapejs }}');
+    
+    const brandLabels = JSON.parse('{{ brand_labels_json|escapejs }}');
+    const brandValues = JSON.parse('{{ brand_values_json|escapejs }}');
+    const brandColors = JSON.parse('{{ brand_colors_json|escapejs }}');
+    
+    // Waste Risk Overview
+    const wasteRiskData = {
+        high: parseInt('{{ data.waste_risk.high|escapejs }}'),
+        high_pct: parseInt('{{ data.waste_risk.high_pct|escapejs }}'),
+        medium: parseInt('{{ data.waste_risk.medium|escapejs }}'),
+        medium_pct: parseInt('{{ data.waste_risk.medium_pct|escapejs }}'),
+        low: parseInt('{{ data.waste_risk.low|escapejs }}'),
+        low_pct: parseInt('{{ data.low_pct|default:"0" }}') || parseInt('{{ data.waste_risk.low_pct|escapejs }}'),
+        total: parseInt('{{ data.total_risk_items|default:"0" }}') || parseInt('{{ data.waste_risk.total_risk_items|escapejs }}')
+    };
+
+    // Dynamic welcome greeting based on system time:
+    // - sunrise (6:00 AM) to 11:59 AM -> Good morning
+    // - 12:00 PM to 4:59 PM -> Good afternoon
+    // - 5:00 PM to sunrise (5:59 AM) -> Good evening
+    document.addEventListener('DOMContentLoaded', () => {
+        const greetingEl = document.getElementById('welcome-greeting');
+        if (greetingEl) {
+            const now = new Date();
+            const hour = now.getHours();
+            let greeting = 'Good evening';
+            if (hour >= 6 && hour < 12) {
+                greeting = 'Good morning';
+            } else if (hour >= 12 && hour < 17) {
+                greeting = 'Good afternoon';
+            }
+            
+            const currentHTML = greetingEl.innerHTML;
+            greetingEl.innerHTML = currentHTML.replace(/^(Good morning|Good afternoon|Good evening)/i, greeting);
+        }
+    });
+</script>
+<script src="{% static 'orchestrator/js/dashboard.js' %}"></script>
+{% endblock %}

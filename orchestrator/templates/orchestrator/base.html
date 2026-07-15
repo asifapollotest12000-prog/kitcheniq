@@ -1,0 +1,65 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="KitchenIQ Orchestrator - Professional smart kitchen intelligence system.">
+    <title>{% block title %}KitchenIQ Orchestrator{% endblock %}</title>
+    <!-- Google Fonts: Inter & Outfit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons (CDN) -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- ApexCharts (CDN) -->
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    
+    <!-- Custom CSS -->
+    {% block extra_css %}{% endblock %}
+    
+    <style>
+        :root {
+            --font-main: 'Inter', sans-serif;
+            --font-display: 'Outfit', sans-serif;
+        }
+        body {
+            font-family: var(--font-main);
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fa;
+        }
+    </style>
+</head>
+<body>
+
+    {% block content %}
+    {% endblock %}
+
+    <script>
+        // Initialize all Lucide icons on the page
+        lucide.createIcons();
+
+        // Premium sidebar submenu toggling logic
+        document.querySelectorAll('.submenu-toggle').forEach(toggle => {
+            toggle.addEventListener('click', function(e) {
+                e.preventDefault();
+                const parent = this.parentElement;
+                const submenu = parent.querySelector('.submenu-list') || parent.querySelector('.submenu');
+                const arrow = this.querySelector('.arrow');
+                
+                if (submenu) {
+                    const isHidden = submenu.style.display === 'none' || !submenu.style.display;
+                    submenu.style.display = isHidden ? 'flex' : 'none';
+                    if (arrow) {
+                        arrow.style.transform = isHidden ? 'rotate(180deg)' : 'rotate(0deg)';
+                    }
+                }
+            });
+        });
+    </script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

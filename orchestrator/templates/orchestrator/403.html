@@ -1,0 +1,94 @@
+{% extends 'orchestrator/base.html' %}
+{% load static %}
+
+{% block title %}Access Denied | KitchenIQ Orchestrator{% endblock %}
+
+{% block extra_css %}
+<style>
+    body {
+        background-color: #2b2b2b;
+        color: #ffffff;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        font-family: 'Inter', sans-serif;
+    }
+    .error-card {
+        background: rgba(25, 27, 38, 0.85);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 16px;
+        padding: 40px;
+        max-width: 480px;
+        text-align: center;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+    }
+    .icon-wrapper {
+        width: 72px;
+        height: 72px;
+        border-radius: 50%;
+        background-color: rgba(239, 68, 68, 0.15);
+        color: #ef4444;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 24px auto;
+    }
+    .icon-wrapper i {
+        width: 36px;
+        height: 36px;
+    }
+    h1 {
+        font-family: 'Outfit', sans-serif;
+        font-size: 26px;
+        font-weight: 700;
+        margin-bottom: 12px;
+    }
+    p {
+        font-size: 14px;
+        color: #8b949e;
+        line-height: 1.6;
+        margin-bottom: 30px;
+    }
+    .back-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background-color: #00828a;
+        color: #ffffff;
+        text-decoration: none;
+        padding: 12px 24px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        transition: background-color 0.2s, transform 0.1s;
+        box-shadow: 0 4px 15px rgba(0, 130, 138, 0.3);
+    }
+    .back-btn:hover {
+        background-color: #009ca6;
+        transform: translateY(-1px);
+    }
+    .back-btn:active {
+        transform: translateY(1px);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="error-card">
+    <div class="icon-wrapper">
+        <i data-lucide="shield-alert"></i>
+    </div>
+    <h1>Access Restricted</h1>
+    <p>
+        The page you are trying to access is reserved for system administrators only. 
+        Please contact your operations supervisor if you believe you should have access.
+    </p>
+    <a href="{% url 'dashboard' %}" class="back-btn">
+        <i data-lucide="arrow-left"></i>
+        <span>Return to Dashboard</span>
+    </a>
+</div>
+{% endblock %}

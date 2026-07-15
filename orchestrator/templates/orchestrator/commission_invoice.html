@@ -1,0 +1,772 @@
+{% extends 'orchestrator/base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}Commission Invoices | KitchenIQ Orchestrator{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'orchestrator/css/dashboard.css?v=3' %}">
+<style>
+    /* Styling overrides for premium UI */
+    .commission-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+        padding: 24px 30px;
+    }
+    .header-title-section {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .header-title-section h1 {
+        font-family: 'Outfit', sans-serif;
+        font-size: 26px;
+        font-weight: 800;
+        color: #0f172a;
+        margin: 0;
+    }
+    .scan-card {
+        background-color: var(--color-card-bg, #ffffff);
+        border: 1px solid var(--color-border, #e2e8f0);
+        border-radius: 12px;
+        padding: 24px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+    }
+    .drag-drop-zone {
+        border: 2px dashed #cbd5e1;
+        border-radius: 12px;
+        padding: 36px 20px;
+        text-align: center;
+        background-color: #f8fafc;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    .drag-drop-zone:hover {
+        border-color: #00828a;
+        background-color: #f0fdfa;
+    }
+    .drag-drop-icon {
+        color: #00828a;
+        margin-bottom: 12px;
+    }
+    .drag-drop-zone p {
+        font-size: 14px;
+        font-weight: 600;
+        color: #334155;
+        margin: 0 0 6px 0;
+    }
+    .drag-drop-zone span {
+        font-size: 12px;
+        color: #64748b;
+    }
+    .table-container {
+        background-color: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        overflow: hidden;
+        margin-top: 16px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+    }
+    .table-header-custom {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 16px 20px;
+        border-bottom: 1px solid #e2e8f0;
+        background-color: #f8fafc;
+    }
+    .table-header-custom h3 {
+        font-family: 'Outfit', sans-serif;
+        font-size: 16px;
+        font-weight: 700;
+        color: #1e293b;
+        margin: 0;
+    }
+    .commission-table {
+        width: 100%;
+        border-collapse: collapse;
+        text-align: left;
+        font-size: 13px;
+    }
+    .commission-table th {
+        background-color: #f8fafc;
+        color: #475569;
+        font-weight: 700;
+        padding: 12px 16px;
+        border-bottom: 1px solid #e2e8f0;
+        text-transform: uppercase;
+        font-size: 10px;
+        letter-spacing: 0.5px;
+    }
+    .commission-table td {
+        padding: 10px 16px;
+        border-bottom: 1px solid #e2e8f0;
+        color: #334155;
+        vertical-align: middle;
+    }
+    .commission-table tbody tr:last-child td {
+        border-bottom: none;
+    }
+    .commission-table input[type="text"],
+    .commission-table input[type="number"] {
+        width: 100%;
+        padding: 6px 10px;
+        border: 1px solid #cbd5e1;
+        border-radius: 6px;
+        font-size: 12px;
+        outline: none;
+        box-sizing: border-box;
+    }
+    .commission-table input[type="text"]:focus,
+    .commission-table input[type="number"]:focus {
+        border-color: #00828a;
+        box-shadow: 0 0 0 2px rgba(0, 130, 138, 0.15);
+    }
+    .badge-platform {
+        font-size: 11px;
+        font-weight: 700;
+        padding: 3px 8px;
+        border-radius: 20px;
+    }
+    .badge-talabat {
+        background-color: #fff1eb;
+        color: #ff5e00;
+    }
+    .badge-noon {
+        background-color: #fef9c3;
+        color: #854d0e;
+    }
+    .badge-careem {
+        background-color: #f0fdf4;
+        color: #166534;
+    }
+    .btn-action-group {
+        display: flex;
+        gap: 6px;
+        justify-content: flex-end;
+    }
+    .btn-icon-custom {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 28px;
+        height: 28px;
+        border-radius: 6px;
+        border: 1px solid #cbd5e1;
+        background-color: #ffffff;
+        color: #475569;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    .btn-icon-custom:hover {
+        background-color: #f1f5f9;
+        color: #0f172a;
+    }
+    .btn-icon-danger {
+        color: #ef4444;
+        border-color: #fca5a5;
+    }
+    .btn-icon-danger:hover {
+        background-color: #fef2f2;
+        color: #b91c1c;
+    }
+    .btn-icon-success {
+        color: #10b981;
+        border-color: #a7f3d0;
+    }
+    .btn-icon-success:hover {
+        background-color: #ecfdf5;
+        color: #047857;
+    }
+    .status-loading {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        padding: 40px;
+        color: #475569;
+        font-weight: 600;
+    }
+    .spinner {
+        width: 24px;
+        height: 24px;
+        border: 3px solid rgba(0, 130, 138, 0.15);
+        border-radius: 50%;
+        border-top-color: #00828a;
+        animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+    /* Submenu animation and display settings */
+    .submenu-list {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        margin: 4px 0 0 0;
+        padding: 0;
+    }
+    .submenu-list li a {
+        padding: 8px 12px !important;
+        font-size: 12px !important;
+        color: #cbd5e1 !important;
+    }
+    .submenu-list li a:hover,
+    .submenu-list li a.active-sub {
+        color: #ffffff !important;
+        background-color: rgba(255, 255, 255, 0.05) !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    
+    <!-- LEFT SIDEBAR -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="brand">
+                <svg class="logo" width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="12" cy="12" r="10" fill="#00828a"/>
+                    <path d="M12 7V17M7 12H17" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                <div class="brand-names">
+                    <span class="brand-main">Kitchen<span class="highlight">IQ</span> <span style="font-size: 10px; font-weight: 700; color: #ffffff; background: #00828a; padding: 1px 4px; border-radius: 3px; vertical-align: middle; margin-left: 4px; letter-spacing: 0.5px; text-transform: uppercase;">Beta</span></span>
+                    <span class="brand-sub">Orchestrator</span>
+                </div>
+            </div>
+            <button class="hamburger-btn">
+                <i data-lucide="menu"></i>
+            </button>
+        </div>
+        
+        <nav class="sidebar-menu">
+            <ul>
+                <li>
+                    <a href="{% url 'dashboard' %}">
+                        <i data-lucide="layout-dashboard"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <i data-lucide="check-square"></i>
+                        <span>Daily Actions</span>
+                        <span class="badge badge-gray">8</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <i data-lucide="bell"></i>
+                        <span>Alerts</span>
+                        <span class="badge badge-brand">12</span>
+                    </a>
+                </li>
+                <li class="has-submenu active">
+                    <a href="#" class="submenu-toggle">
+                        <i data-lucide="trending-up"></i>
+                        <span>Sales & Orders</span>
+                        <i data-lucide="chevron-down" class="arrow" style="transform: rotate(0deg); transition: transform 0.2s;"></i>
+                    </a>
+                    <ul class="submenu-list">
+                        <li>
+                            <a href="{% url 'commission_invoice' %}" class="active-sub">
+                                <i data-lucide="scan" style="width:14px; height:14px; vertical-align:middle; margin-right:6px;"></i>
+                                <span>Scan Commission Invoice</span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#">
+                        <i data-lucide="activity"></i>
+                        <span>Performance</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'recipes' %}">
+                        <i data-lucide="book-open"></i>
+                        <span>Menu &amp; Recipes</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <i data-lucide="dollar-sign"></i>
+                        <span>Profitability</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <i data-lucide="trash-2"></i>
+                        <span>Waste Management</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <i data-lucide="clipboard-list"></i>
+                        <span>Production & Prep</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'inventory' %}">
+                        <i data-lucide="package"></i>
+                        <span>Inventory</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+        
+        <div class="sidebar-footer">
+            <a href="{% url 'settings' %}">
+                <i data-lucide="settings"></i>
+                <span>Settings</span>
+            </a>
+            <a href="{% url 'logout' %}" class="logout">
+                <i data-lucide="log-out"></i>
+                <span>Logout</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+        <div class="commission-grid">
+            
+            <div class="header-title-section">
+                <div>
+                    <span style="color: #64748b; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Sales & Orders</span>
+                    <h1>Scan Platform Commission Invoice</h1>
+                </div>
+            </div>
+
+            <!-- SCAN COMPONENT -->
+            <div class="scan-card">
+                <div class="drag-drop-zone" id="dropZone" onclick="document.getElementById('pdfFileInput').click()">
+                    <i data-lucide="file-text" class="drag-drop-icon" style="width: 48px; height: 48px; margin-inline: auto;"></i>
+                    <p>Upload Commission Invoice PDF</p>
+                    <span>Supports Talabat, Noon Food, or Careem balance summaries. Click or drag to upload.</span>
+                    <input type="file" id="pdfFileInput" accept="application/pdf" style="display: none;" multiple>
+                </div>
+
+                <div id="scanStatus" style="display: none;">
+                    <div class="status-loading">
+                        <div class="spinner"></div>
+                        <span id="statusText">Converting PDF and extracting mapping data...</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PREVIEW SECTION -->
+            <div class="table-container" id="previewSection" style="display: none;">
+                <div class="table-header-custom">
+                    <h3>Preview Scanned Commission Invoice</h3>
+                    <button class="btn btn-primary" onclick="submitPreviewRows()" style="height: 34px; font-size: 12px;">
+                        <i data-lucide="plus-circle" style="width: 14px; height: 14px; margin-right: 6px;"></i> Save Scanned Invoice Data
+                    </button>
+                </div>
+                <div style="overflow-x: auto;">
+                    <table class="commission-table" id="previewTable">
+                        <thead>
+                            <tr>
+                                <th style="width: 110px;">Month</th>
+                                <th style="width: 130px;">Brand Name</th>
+                                <th style="width: 140px;">License Name</th>
+                                <th style="width: 80px; text-align: right;">Orders</th>
+                                <th style="width: 110px; text-align: right;">Net Sales ({{ currency_symbol }})</th>
+                                <th style="width: 110px; text-align: right;">Commission ({{ currency_symbol }})</th>
+                                <th style="width: 100px; text-align: right;">CPC ({{ currency_symbol }})</th>
+                                <th style="width: 110px; text-align: right;">Ad Charges ({{ currency_symbol }})</th>
+                                <th style="width: 100px; text-align: right;">Monthly Fee ({{ currency_symbol }})</th>
+                                <th style="width: 80px; text-align: center;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="previewTbody">
+                            <!-- Populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- MAIN SAVED COMMISSION TABLE -->
+            <div class="table-container">
+                <div class="table-header-custom">
+                    <h3>Saved Platform Commission Invoices</h3>
+                </div>
+                <div style="overflow-x: auto;">
+                    <table class="commission-table" id="mainTable">
+                        <thead>
+                            <tr>
+                                <th style="width: 110px;">Month</th>
+                                <th style="width: 130px;">Brand Name</th>
+                                <th style="width: 140px;">License Name</th>
+                                <th style="width: 80px; text-align: right;">Orders</th>
+                                <th style="width: 110px; text-align: right;">Net Sales ({{ currency_symbol }})</th>
+                                <th style="width: 110px; text-align: right;">Commission ({{ currency_symbol }})</th>
+                                <th style="width: 100px; text-align: right;">CPC ({{ currency_symbol }})</th>
+                                <th style="width: 110px; text-align: right;">Ad Charges ({{ currency_symbol }})</th>
+                                <th style="width: 100px; text-align: right;">Monthly Fee ({{ currency_symbol }})</th>
+                                <th style="width: 100px; text-align: center;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for inv in invoices %}
+                            <tr data-id="{{ inv.id }}">
+                                <td>
+                                    <span class="view-mode">{{ inv.month }}</span>
+                                    <input type="text" class="edit-mode edit-month" value="{{ inv.month }}" style="display: none;">
+                                </td>
+                                <td>
+                                    <span class="view-mode font-bold">{{ inv.brand_name|default:"&mdash;" }}</span>
+                                    <input type="text" class="edit-mode edit-brand" value="{{ inv.brand_name }}" style="display: none;">
+                                </td>
+                                <td>
+                                    <span class="view-mode">{{ inv.license_name|default:"&mdash;" }}</span>
+                                    <input type="text" class="edit-mode edit-license" value="{{ inv.license_name }}" style="display: none;">
+                                </td>
+                                <td style="text-align: right; font-family: monospace;">
+                                    <span class="view-mode">{{ inv.orders|intcomma }}</span>
+                                    <input type="number" class="edit-mode edit-orders text-right" value="{{ inv.orders }}" style="display: none;">
+                                </td>
+                                <td style="text-align: right; font-family: monospace;">
+                                    <span class="view-mode">{{ inv.net_sales|floatformat:2|intcomma }}</span>
+                                    <input type="number" step="0.01" class="edit-mode edit-sales text-right" value="{{ inv.net_sales|stringformat:'.2f' }}" style="display: none;">
+                                </td>
+                                <td style="text-align: right; font-family: monospace;">
+                                    <span class="view-mode">{{ inv.commission|floatformat:2|intcomma }}</span>
+                                    <input type="number" step="0.01" class="edit-mode edit-commission text-right" value="{{ inv.commission|stringformat:'.2f' }}" style="display: none;">
+                                </td>
+                                <td style="text-align: right; font-family: monospace;">
+                                    <span class="view-mode">{{ inv.cpc|floatformat:2|intcomma }}</span>
+                                    <input type="number" step="0.01" class="edit-mode edit-cpc text-right" value="{{ inv.cpc|stringformat:'.2f' }}" style="display: none;">
+                                </td>
+                                <td style="text-align: right; font-family: monospace;">
+                                    <span class="view-mode">{{ inv.advertisement_charges|floatformat:2|intcomma }}</span>
+                                    <input type="number" step="0.01" class="edit-mode edit-ads text-right" value="{{ inv.advertisement_charges|stringformat:'.2f' }}" style="display: none;">
+                                </td>
+                                <td style="text-align: right; font-family: monospace;">
+                                    <span class="view-mode">{{ inv.monthly_fee|floatformat:2|intcomma }}</span>
+                                    <input type="number" step="0.01" class="edit-mode edit-fee text-right" value="{{ inv.monthly_fee|stringformat:'.2f' }}" style="display: none;">
+                                </td>
+                                <td style="text-align: center;">
+                                    <div class="btn-action-group">
+                                        <button class="btn-icon-custom btn-edit-row" onclick="toggleEditRow({{ inv.id }}, this)" title="Edit">
+                                            <i data-lucide="edit-2" style="width: 14px; height: 14px;"></i>
+                                        </button>
+                                        <button class="btn-icon-custom btn-icon-success btn-save-row" onclick="saveEditedRow({{ inv.id }}, this)" title="Save" style="display: none;">
+                                            <i data-lucide="check" style="width: 14px; height: 14px;"></i>
+                                        </button>
+                                        <button class="btn-icon-custom btn-icon-danger" onclick="deleteSavedRow({{ inv.id }}, this)" title="Delete">
+                                            <i data-lucide="trash-2" style="width: 14px; height: 14px;"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="10" style="text-align: center; padding: 48px; color: #94a3b8;">
+                                    <i data-lucide="file-spreadsheet" style="width: 40px; height: 40px; margin-bottom: 12px; opacity: 0.3; display: block; margin-inline: auto;"></i>
+                                    No saved commission invoices found. Upload a PDF to import.
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </main>
+</div>
+
+<!-- CSRF Token -->
+<script>
+    const csrfToken = '{{ csrf_token }}';
+    const currencySym = '{{ currency_symbol }}';
+</script>
+
+<!-- Drag and drop upload JS -->
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('pdfFileInput');
+        const scanStatus = document.getElementById('scanStatus');
+        
+        // Handle dragover
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.style.borderColor = '#00828a';
+            dropZone.style.backgroundColor = '#f0fdfa';
+        });
+
+        // Handle dragleave
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.style.borderColor = '';
+            dropZone.style.backgroundColor = '';
+        });
+
+        // Handle drop
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.style.borderColor = '';
+            dropZone.style.backgroundColor = '';
+            if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+                fileInput.files = e.dataTransfer.files;
+                triggerUpload();
+            }
+        });
+
+        // Handle file select
+        fileInput.addEventListener('change', () => {
+            if (fileInput.files && fileInput.files[0]) {
+                triggerUpload();
+            }
+        });
+
+        function triggerUpload() {
+            const files = Array.from(fileInput.files);
+            if (files.length === 0) return;
+
+            const pdfFiles = files.filter(f => f.type === 'application/pdf');
+            if (pdfFiles.length === 0) {
+                alert('Please upload only PDF files.');
+                return;
+            }
+
+            // Show status
+            scanStatus.style.display = 'block';
+            dropZone.style.display = 'none';
+            document.getElementById('statusText').textContent = `Scanning ${pdfFiles.length} file(s)...`;
+
+            let promises = pdfFiles.map(file => {
+                const formData = new FormData();
+                formData.append('pdf', file);
+
+                return fetch('/api/sales/commission-invoice/scan/', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': csrfToken
+                    },
+                    body: formData
+                })
+                .then(res => {
+                    if (!res.ok) {
+                        throw new Error(`Failed to scan file "${file.name}"`);
+                    }
+                    return res.json();
+                })
+                .then(data => {
+                    if (data.success && data.item) {
+                        addPreviewRow(data.item);
+                    } else {
+                        console.error(`Error scanning "${file.name}":`, data.error);
+                    }
+                })
+                .catch(err => {
+                    console.error(`Failed to scan "${file.name}":`, err.message);
+                });
+            });
+
+            Promise.all(promises).then(() => {
+                scanStatus.style.display = 'none';
+                dropZone.style.display = 'block';
+                fileInput.value = ''; // Reset
+            });
+        }
+    });
+
+    const previewItems = [];
+
+    function addPreviewRow(item) {
+        const previewSection = document.getElementById('previewSection');
+        const tbody = document.getElementById('previewTbody');
+
+        previewSection.style.display = 'block';
+
+        // Add to local array
+        previewItems.push(item);
+        const idx = previewItems.length - 1;
+
+        const tr = document.createElement('tr');
+        tr.id = 'preview-row-' + idx;
+        tr.innerHTML = `
+            <td><input type="text" class="prev-month" value="${escapeHtml(item.month)}" onchange="updatePreviewVal(${idx}, 'month', this.value)"></td>
+            <td><input type="text" class="prev-brand font-bold" value="${escapeHtml(item.brand_name)}" onchange="updatePreviewVal(${idx}, 'brand_name', this.value)"></td>
+            <td><input type="text" class="prev-license" value="${escapeHtml(item.license_name)}" onchange="updatePreviewVal(${idx}, 'license_name', this.value)"></td>
+            <td><input type="number" class="prev-orders text-right" value="${item.orders}" onchange="updatePreviewVal(${idx}, 'orders', this.value)" style="font-family: monospace;"></td>
+            <td><input type="number" step="0.01" class="prev-sales text-right" value="${item.net_sales}" onchange="updatePreviewVal(${idx}, 'net_sales', this.value)" style="font-family: monospace;"></td>
+            <td><input type="number" step="0.01" class="prev-commission text-right" value="${item.commission}" onchange="updatePreviewVal(${idx}, 'commission', this.value)" style="font-family: monospace;"></td>
+            <td><input type="number" step="0.01" class="prev-cpc text-right" value="${item.cpc}" onchange="updatePreviewVal(${idx}, 'cpc', this.value)" style="font-family: monospace;"></td>
+            <td><input type="number" step="0.01" class="prev-ads text-right" value="${item.advertisement_charges}" onchange="updatePreviewVal(${idx}, 'advertisement_charges', this.value)" style="font-family: monospace;"></td>
+            <td><input type="number" step="0.01" class="prev-fee text-right" value="${item.monthly_fee}" onchange="updatePreviewVal(${idx}, 'monthly_fee', this.value)" style="font-family: monospace;"></td>
+            <td style="text-align: center;">
+                <button class="btn-icon-custom btn-icon-danger" onclick="deletePreviewRow(${idx})" title="Remove">
+                    <i data-lucide="trash-2" style="width: 14px; height: 14px;"></i>
+                </button>
+            </td>
+        `;
+        tbody.appendChild(tr);
+        if (window.lucide) lucide.createIcons();
+    }
+
+    function updatePreviewVal(idx, field, value) {
+        if (previewItems[idx]) {
+            previewItems[idx][field] = value;
+        }
+    }
+
+    function deletePreviewRow(idx) {
+        const row = document.getElementById('preview-row-' + idx);
+        if (row) {
+            row.remove();
+            previewItems[idx] = null; // Mark deleted
+        }
+        
+        // Hide section if no visible items remain
+        const visibleRows = document.querySelectorAll('#previewTbody tr');
+        if (visibleRows.length === 0) {
+            document.getElementById('previewSection').style.display = 'none';
+        }
+    }
+
+    function submitPreviewRows() {
+        const itemsToSave = previewItems.filter(item => item !== null);
+        if (itemsToSave.length === 0) {
+            alert('No preview rows to save.');
+            return;
+        }
+
+        fetch('/api/sales/commission-invoice/add/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
+            },
+            body: JSON.stringify({ items: itemsToSave })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                alert(`Successfully saved ${data.count} commission invoice records!`);
+                location.reload(); // Reload to populate the main table
+            } else {
+                alert('Save failed: ' + (data.error || 'Unknown error'));
+            }
+        })
+        .catch(err => {
+            alert('Save failed: ' + err.message);
+        });
+    }
+
+    // MAIN TABLE FUNCTIONS (Edit, Save, Delete)
+    function toggleEditRow(id, btn) {
+        const tr = document.querySelector(`#mainTable tr[data-id="${id}"]`);
+        if (!tr) return;
+
+        const viewModes = tr.querySelectorAll('.view-mode');
+        const editModes = tr.querySelectorAll('.edit-mode');
+
+        viewModes.forEach(el => el.style.display = 'none');
+        editModes.forEach(el => el.style.display = 'block');
+
+        // Toggle buttons
+        btn.style.display = 'none';
+        tr.querySelector('.btn-save-row').style.display = 'inline-flex';
+    }
+
+    function saveEditedRow(id, btn) {
+        const tr = document.querySelector(`#mainTable tr[data-id="${id}"]`);
+        if (!tr) return;
+
+        const payload = {
+            month: tr.querySelector('.edit-month').value.trim(),
+            brand_name: tr.querySelector('.edit-brand').value.trim(),
+            license_name: tr.querySelector('.edit-license').value.trim(),
+            orders: tr.querySelector('.edit-orders').value.trim(),
+            net_sales: tr.querySelector('.edit-sales').value.trim(),
+            commission: tr.querySelector('.edit-commission').value.trim(),
+            cpc: tr.querySelector('.edit-cpc').value.trim(),
+            advertisement_charges: tr.querySelector('.edit-ads').value.trim(),
+            monthly_fee: tr.querySelector('.edit-fee').value.trim(),
+        };
+
+        fetch(`/api/sales/commission-invoice/edit/${id}/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
+            },
+            body: JSON.stringify(payload)
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                // Update views
+                tr.querySelector('.view-mode:nth-child(1)').textContent = payload.month;
+                tr.querySelector('.view-mode:nth-child(2)').textContent = payload.brand_name || '—';
+                tr.querySelector('.view-mode:nth-child(3)').textContent = payload.license_name || '—';
+                tr.querySelector('.view-mode:nth-child(4)').textContent = parseInt(payload.orders).toLocaleString();
+                tr.querySelector('.view-mode:nth-child(5)').textContent = parseFloat(payload.net_sales).toLocaleString(undefined, {minimumFractionDigits:2});
+                tr.querySelector('.view-mode:nth-child(6)').textContent = parseFloat(payload.commission).toLocaleString(undefined, {minimumFractionDigits:2});
+                tr.querySelector('.view-mode:nth-child(7)').textContent = parseFloat(payload.cpc).toLocaleString(undefined, {minimumFractionDigits:2});
+                tr.querySelector('.view-mode:nth-child(8)').textContent = parseFloat(payload.advertisement_charges).toLocaleString(undefined, {minimumFractionDigits:2});
+                tr.querySelector('.view-mode:nth-child(9)').textContent = parseFloat(payload.monthly_fee).toLocaleString(undefined, {minimumFractionDigits:2});
+
+                // Toggle back to view mode
+                const viewModes = tr.querySelectorAll('.view-mode');
+                const editModes = tr.querySelectorAll('.edit-mode');
+
+                viewModes.forEach(el => el.style.display = 'block');
+                editModes.forEach(el => el.style.display = 'none');
+
+                btn.style.display = 'none';
+                tr.querySelector('.btn-edit-row').style.display = 'inline-flex';
+            } else {
+                alert('Failed to save: ' + (data.error || 'Unknown error'));
+            }
+        })
+        .catch(err => {
+            alert('Failed to save: ' + err.message);
+        });
+    }
+
+    function deleteSavedRow(id, btn) {
+        if (!confirm('Are you sure you want to delete this commission invoice record?')) return;
+
+        fetch(`/api/sales/commission-invoice/delete/${id}/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': csrfToken
+            }
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                const tr = document.querySelector(`#mainTable tr[data-id="${id}"]`);
+                if (tr) tr.remove();
+                
+                // If table is empty, refresh page to show placeholder row
+                const remainingRows = document.querySelectorAll('#mainTable tbody tr');
+                if (remainingRows.length === 0) {
+                    location.reload();
+                }
+            } else {
+                alert('Delete failed: ' + (data.error || 'Unknown error'));
+            }
+        })
+        .catch(err => {
+            alert('Delete failed: ' + err.message);
+        });
+    }
+
+    function escapeHtml(text) {
+        if (!text) return '';
+        return text
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
+</script>
+{% endblock %}

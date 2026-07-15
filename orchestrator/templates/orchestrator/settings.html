@@ -1,0 +1,510 @@
+{% extends 'orchestrator/base.html' %}
+{% load static %}
+
+{% block title %}Settings | KitchenIQ Orchestrator{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'orchestrator/css/dashboard.css?v=3' %}">
+<style>
+    /* Settings-specific overrides/additions */
+    .settings-grid {
+        display: grid;
+        grid-template-columns: 280px 1fr;
+        gap: 30px;
+        align-items: start;
+    }
+    
+    .profile-card {
+        background-color: var(--color-card-bg);
+        border: 1px solid var(--color-border);
+        border-radius: 12px;
+        padding: 30px 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+    }
+    
+    .profile-card .avatar-large {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 4px solid var(--color-border);
+        margin-bottom: 20px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        transition: transform 0.3s;
+    }
+    
+    .profile-card .avatar-large:hover {
+        transform: scale(1.05);
+    }
+    
+    .profile-card .profile-name {
+        font-family: 'Outfit', sans-serif;
+        font-size: 18px;
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 4px;
+    }
+    
+    .profile-card .profile-designation {
+        font-size: 13px;
+        color: var(--color-text-sub);
+        font-weight: 500;
+        margin-bottom: 20px;
+    }
+    
+    .profile-card .admin-badge {
+        font-size: 11px;
+        background-color: rgba(0, 130, 138, 0.1);
+        color: #00828a;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+    
+    .settings-form-box {
+        background-color: var(--color-card-bg);
+        border: 1px solid var(--color-border);
+        border-radius: 12px;
+        padding: 30px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+    }
+    
+    .form-section-title {
+        font-family: 'Outfit', sans-serif;
+        font-size: 16px;
+        font-weight: 600;
+        color: #0f172a;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid var(--color-border);
+    }
+    
+    .settings-form {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+    }
+    
+    .form-group-full {
+        grid-column: span 2;
+    }
+    
+    .settings-form-box label {
+        font-size: 13px;
+        font-weight: 600;
+        color: #475569;
+        margin-bottom: 6px;
+        display: block;
+    }
+    
+    .settings-form-box input {
+        width: 100%;
+        padding: 10px 14px;
+        font-size: 14px;
+        border: 1px solid var(--color-border);
+        border-radius: 8px;
+        outline: none;
+        transition: border-color 0.2s, box-shadow 0.2s;
+        font-family: inherit;
+        background-color: #f8fafc;
+        color: #334155;
+    }
+    
+    .settings-form-box input:focus {
+        border-color: #00828a;
+        background-color: #ffffff;
+        box-shadow: 0 0 0 3px rgba(0, 130, 138, 0.1);
+    }
+    
+    .settings-form-actions {
+        grid-column: span 2;
+        display: flex;
+        justify-content: flex-end;
+        gap: 12px;
+        margin-top: 10px;
+        border-top: 1px solid var(--color-border);
+        padding-top: 20px;
+    }
+    
+    .btn {
+        padding: 10px 20px;
+        font-size: 13px;
+        font-weight: 600;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        border: none;
+        font-family: inherit;
+    }
+    
+    .btn-secondary {
+        background-color: #f1f5f9;
+        color: #475569;
+    }
+    
+    .btn-secondary:hover {
+        background-color: #e2e8f0;
+    }
+    
+    .btn-primary {
+        background-color: #00828a;
+        color: #ffffff;
+        box-shadow: 0 4px 12px rgba(0, 130, 138, 0.2);
+    }
+    
+    .btn-primary:hover {
+        background-color: #009ca6;
+        box-shadow: 0 4px 16px rgba(0, 130, 138, 0.3);
+    }
+    
+    .settings-alert {
+        grid-column: span 2;
+        padding: 12px 16px;
+        background-color: rgba(16, 185, 129, 0.1);
+        border: 1px solid rgba(16, 185, 129, 0.25);
+        color: #047857;
+        font-size: 13px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: 500;
+    }
+    
+    .settings-alert i {
+        width: 16px;
+        height: 16px;
+    }
+    
+    @media (max-width: 1200px) {
+        .settings-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .settings-form {
+            grid-template-columns: 1fr;
+        }
+        .form-group-full {
+            grid-column: span 1;
+        }
+        .settings-form-actions {
+            grid-column: span 1;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    
+    <!-- LEFT SIDEBAR -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="brand">
+                <svg class="logo" width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="12" cy="12" r="10" fill="#00828a"/>
+                    <path d="M12 7V17M7 12H17" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                <div class="brand-names">
+                    <span class="brand-main">Kitchen<span class="highlight">IQ</span> <span style="font-size: 10px; font-weight: 700; color: #ffffff; background: #00828a; padding: 1px 4px; border-radius: 3px; vertical-align: middle; margin-left: 4px; letter-spacing: 0.5px; text-transform: uppercase;">Beta</span></span>
+                    <span class="brand-sub">Orchestrator</span>
+                </div>
+            </div>
+            <button class="hamburger-btn">
+                <i data-lucide="menu"></i>
+            </button>
+        </div>
+        
+        <nav class="sidebar-menu">
+            <ul>
+                <li>
+                    <a href="{% url 'dashboard' %}">
+                        <i data-lucide="layout-dashboard"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <i data-lucide="check-square"></i>
+                        <span>Daily Actions</span>
+                        <span class="badge badge-gray">8</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <i data-lucide="bell"></i>
+                        <span>Alerts</span>
+                        <span class="badge badge-brand">12</span>
+                    </a>
+                </li>
+                <li class="has-submenu">
+                    <a href="#" class="submenu-toggle">
+                        <i data-lucide="trending-up"></i>
+                        <span>Sales & Orders</span>
+                        <i data-lucide="chevron-right" class="arrow" style="transition: transform 0.2s;"></i>
+                    </a>
+                    <ul class="submenu-list" style="display: none; list-style: none; padding-left: 24px; margin-top: 4px; flex-direction: column; gap: 4px;">
+                        <li>
+                            <a href="{% url 'commission_invoice' %}" style="padding: 6px 12px; font-size: 12px;">
+                                <i data-lucide="scan" style="width: 14px; height: 14px; vertical-align: middle; margin-right: 6px;"></i>
+                                <span>Scan Commission Invoice</span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="has-submenu">
+                    <a href="#">
+                        <i data-lucide="activity"></i>
+                        <span>Performance</span>
+                        <i data-lucide="chevron-right" class="arrow"></i>
+                    </a>
+                </li>
+                <li class="has-submenu">
+                    <a href="#">
+                        <i data-lucide="book-open"></i>
+                        <span>Menu & Recipes</span>
+                        <i data-lucide="chevron-right" class="arrow"></i>
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <i data-lucide="dollar-sign"></i>
+                        <span>Profitability</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <i data-lucide="trash-2"></i>
+                        <span>Waste Management</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <i data-lucide="clipboard-list"></i>
+                        <span>Production & Prep</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'inventory' %}">
+                        <i data-lucide="package"></i>
+                        <span>Inventory</span>
+                    </a>
+                </li>
+                <li class="has-submenu">
+                    <a href="#">
+                        <i data-lucide="chef-hat"></i>
+                        <span>Kitchen Operations</span>
+                        <i data-lucide="chevron-right" class="arrow"></i>
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <i data-lucide="users"></i>
+                        <span>Staff & Labour</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <i data-lucide="megaphone"></i>
+                        <span>Marketing & Campaigns</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <i data-lucide="file-text"></i>
+                        <span>Reports & Exports</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <i data-lucide="bar-chart-2"></i>
+                        <span>Benchmarking</span>
+                    </a>
+                </li>
+                <li class="active">
+                    <a href="{% url 'settings' %}">
+                        <i data-lucide="settings"></i>
+                        <span>Settings</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+        
+        <div class="sidebar-footer">
+            <div class="active-site-box">
+                <span class="label">Active Site</span>
+                <div class="site-selector-trigger">
+                    <span class="site-name">Hessa Street</span>
+                    <a href="#" class="change-link">Change</a>
+                </div>
+            </div>
+            
+            <a href="#" class="support-link">
+                <i data-lucide="help-circle"></i>
+                <span>Support</span>
+            </a>
+        </div>
+    </aside>
+    
+    <!-- MAIN CONTENT PANEL -->
+    <main class="main-content">
+        <!-- HEADER -->
+        <header class="content-header">
+            <div class="header-left">
+                <h1>User Settings</h1>
+                <p class="subtitle">Manage user personal info, designations, and security credentials.</p>
+            </div>
+            
+            <div class="header-right">
+                <!-- User Profile & Notification -->
+                <div class="user-profile-widget">
+                    <div class="profile-info" onclick="toggleProfileDropdown()">
+                        <img id="headerAvatar" src="{{ request.user.profile.profile_pic_url|default:'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=80&fit=crop&q=80' }}" alt="Alex Morgan" class="avatar">
+                        <div class="profile-details">
+                            <span class="user-name">
+                                {{ request.user.first_name|default:request.user.username }}
+                                <i data-lucide="chevron-down" class="chevron"></i>
+                            </span>
+                            <span class="user-role">{{ request.user.profile.designation|default:'Operations Manager' }}</span>
+                        </div>
+                        
+                        <!-- Dropdown Menu -->
+                        <div class="profile-menu" id="profileDropdown">
+                            <a href="{% url 'dashboard' %}"><i data-lucide="layout-dashboard"></i> Dashboard</a>
+                            <hr>
+                            <a href="{% url 'logout' %}" class="logout-link"><i data-lucide="log-out"></i> Log Out</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+        
+        <!-- SETTINGS PANEL GRID -->
+        <section class="settings-grid">
+            <!-- Profile Card Panel -->
+            <div class="profile-card">
+                <img id="avatarPreview" src="{{ request.user.profile.profile_pic_url|default:'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=80&fit=crop&q=80' }}" alt="Profile Preview" class="avatar-large">
+                <span class="profile-name">{{ request.user.first_name }} {{ request.user.last_name }}</span>
+                <span class="profile-designation">{{ request.user.profile.designation }}</span>
+                <span class="admin-badge"><i data-lucide="shield-check"></i> System Admin</span>
+            </div>
+            
+            <!-- Forms Settings Panel -->
+            <div class="settings-form-box">
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="settings-alert">
+                            <i data-lucide="check-circle-2"></i>
+                            <span>{{ message }}</span>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+                
+                <form method="POST" class="settings-form">
+                    {% csrf_token %}
+                    
+                    <div class="form-group-full">
+                        <h3 class="form-section-title">User Account Details</h3>
+                    </div>
+                    
+                    <div>
+                        <label for="{{ u_form.username.id_for_label }}">Username</label>
+                        {{ u_form.username }}
+                    </div>
+                    
+                    <div>
+                        <label for="{{ u_form.email.id_for_label }}">Email Address</label>
+                        {{ u_form.email }}
+                    </div>
+                    
+                    <div>
+                        <label for="{{ u_form.first_name.id_for_label }}">First Name</label>
+                        {{ u_form.first_name }}
+                    </div>
+                    
+                    <div>
+                        <label for="{{ u_form.last_name.id_for_label }}">Last Name</label>
+                        {{ u_form.last_name }}
+                    </div>
+                    
+                    <div class="form-group-full">
+                        <h3 class="form-section-title">Orchestrator Settings</h3>
+                    </div>
+                    
+                    <div>
+                        <label for="{{ p_form.designation.id_for_label }}">Designation / Role</label>
+                        {{ p_form.designation }}
+                    </div>
+                    
+                    <div>
+                        <label for="{{ p_form.profile_pic_url.id_for_label }}">Profile Picture URL</label>
+                        {{ p_form.profile_pic_url }}
+                    </div>
+                    
+                    <div>
+                        <label for="{{ p_form.currency.id_for_label }}">Currency Settings</label>
+                        {{ p_form.currency }}
+                    </div>
+
+                    
+                    <div class="settings-form-actions">
+                        <a href="{% url 'dashboard' %}" class="btn btn-secondary">
+                            <i data-lucide="x"></i> Cancel
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i data-lucide="save"></i> Save Changes
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </section>
+    </main>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Toggle profile dropdown menu
+    function toggleProfileDropdown() {
+        const dropdown = document.getElementById('profileDropdown');
+        dropdown.classList.toggle('show');
+    }
+    
+    // Close dropdown menu when clicking outside
+    window.addEventListener('click', function(e) {
+        const profileWidget = document.querySelector('.profile-info');
+        const profileDropdown = document.getElementById('profileDropdown');
+        if (profileDropdown && profileDropdown.classList.contains('show')) {
+            if (!profileWidget.contains(e.target)) {
+                profileDropdown.classList.remove('show');
+            }
+        }
+    });
+
+    // Handle interactive URL preview for profile avatar
+    const picUrlInput = document.getElementById("{{ p_form.profile_pic_url.id_for_label }}");
+    const avatarPreview = document.getElementById("avatarPreview");
+    
+    if (picUrlInput && avatarPreview) {
+        picUrlInput.addEventListener("input", function() {
+            const val = picUrlInput.value.trim();
+            if (val) {
+                avatarPreview.src = val;
+            }
+        });
+    }
+</script>
+{% endblock %}

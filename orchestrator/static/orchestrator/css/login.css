@@ -1,0 +1,305 @@
+body {
+    background-color: #2b2b2b;
+    color: #c9d1d9;
+    margin: 0;
+    font-family: 'Inter', sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+.login-wrapper {
+    position: relative;
+    width: 100%;
+    max-width: 450px;
+    padding: 20px;
+    z-index: 10;
+}
+
+.background-decorations {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    z-index: -1;
+}
+
+.circle {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(100px);
+}
+
+.circle-1 {
+    top: -10%;
+    right: -10%;
+    width: 50vw;
+    height: 50vw;
+    background: radial-gradient(circle, rgba(0, 130, 138, 0.15) 0%, rgba(0, 130, 138, 0) 70%);
+}
+
+.circle-2 {
+    bottom: -10%;
+    left: -10%;
+    width: 60vw;
+    height: 60vw;
+    background: radial-gradient(circle, rgba(46, 91, 255, 0.1) 0%, rgba(46, 91, 255, 0) 70%);
+}
+
+.login-card {
+    background: rgba(25, 27, 38, 0.85);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 20px;
+    padding: 40px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.login-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 45px rgba(0, 130, 138, 0.1);
+}
+
+.brand-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+.logo-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.brand-text {
+    display: flex;
+    flex-direction: column;
+}
+
+.brand-title {
+    font-family: 'Outfit', sans-serif;
+    font-size: 24px;
+    font-weight: 800;
+    color: #ffffff;
+    letter-spacing: -0.5px;
+}
+
+.brand-title .highlight {
+    color: #00828a;
+}
+
+.brand-subtitle {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: #8b949e;
+    font-weight: 600;
+    margin-top: -3px;
+}
+
+h2 {
+    font-family: 'Outfit', sans-serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: #ffffff;
+    margin: 0 0 8px 0;
+}
+
+.login-instruction {
+    font-size: 14px;
+    color: #8b949e;
+    margin: 0 0 25px 0;
+    line-height: 1.5;
+}
+
+.messages-container {
+    margin-bottom: 20px;
+}
+
+.alert {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    line-height: 1.4;
+}
+
+.alert-error {
+    background-color: rgba(239, 68, 68, 0.15);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    color: #f87171;
+}
+
+.alert-icon {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+}
+
+.login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form-group label {
+    font-size: 13px;
+    font-weight: 500;
+    color: #c9d1d9;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.input-icon {
+    width: 14px;
+    height: 14px;
+    color: #8b949e;
+}
+
+.form-group input {
+    background-color: rgba(13, 15, 23, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 12px 14px;
+    font-size: 15px;
+    color: #ffffff;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    font-family: inherit;
+}
+
+.form-group input::placeholder {
+    color: #484f58;
+}
+
+.form-group input:focus {
+    border-color: #00828a;
+    box-shadow: 0 0 0 3px rgba(0, 130, 138, 0.15);
+}
+
+.form-options {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+}
+
+.remember-me {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    color: #8b949e;
+}
+
+.remember-me input {
+    accent-color: #00828a;
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+}
+
+.forgot-pass {
+    color: #00828a;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s;
+}
+
+.forgot-pass:hover {
+    color: #009ca6;
+    text-decoration: underline;
+}
+
+.submit-btn {
+    background-color: #00828a;
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    padding: 14px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    transition: background-color 0.2s, transform 0.1s, box-shadow 0.2s;
+    font-family: inherit;
+    box-shadow: 0 4px 15px rgba(0, 130, 138, 0.3);
+}
+
+.submit-btn:hover {
+    background-color: #009ca6;
+    box-shadow: 0 6px 20px rgba(0, 130, 138, 0.4);
+}
+
+.submit-btn:active {
+    transform: scale(0.98);
+}
+
+.btn-icon {
+    width: 16px;
+    height: 16px;
+    transition: transform 0.2s;
+}
+
+.submit-btn:hover .btn-icon {
+    transform: translateX(4px);
+}
+
+.login-footer {
+    margin-top: 35px;
+    text-align: center;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    padding-top: 20px;
+}
+
+.login-footer p {
+    font-size: 11px;
+    color: #484f58;
+    margin: 0 0 10px 0;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.secure-badges {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+
+.badge {
+    font-size: 11px;
+    color: #8b949e;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background-color: rgba(255, 255, 255, 0.03);
+    padding: 4px 8px;
+    border-radius: 4px;
+    border: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.badge i {
+    width: 12px;
+    height: 12px;
+    color: #22c55e;
+}
