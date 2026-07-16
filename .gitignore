@@ -34,3 +34,7 @@ media/
 ~$*.docx
 *Screenshots/
 *Screenshots.zip
+
+# Added by push_to_github.py
+githubtoken.txt
+push_to_github.py
